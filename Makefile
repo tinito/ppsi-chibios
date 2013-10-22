@@ -6,7 +6,8 @@
 # PROTO_EXT ?= whiterabbit
 
 # The default architecture is hosted GNU/Linux stuff
-ARCH ?= unix
+ARCH ?= chibios
+CROSS_COMPILE ?= arm-none-eabi-
 
 # Also, you can set USER_CFLAGS, like this (or on the command line)
 # USER_CFLAGS = -DVERB_LOG_MSGS -DCONFIG_PPSI_RUNTIME_VERBOSITY

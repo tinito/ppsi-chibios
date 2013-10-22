@@ -1,4 +1,4 @@
 
 OBJ-libarch += \
-	time-bathos/bathos-time.o \
-	time-bathos/bathos-socket.o
+	time-chibios/chibios-time.o \
+	time-chibios/chibios-socket.o

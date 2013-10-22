@@ -1,16 +1,18 @@
 /*
  * Alessandro Rubini for CERN, 2013 -- LGPL 2.1 or later
- * (Bathos code heavily based on bare code)
+ * (chibios code heavily based on bare code)
  */
-#include <bathos/bathos.h>
-#include <bathos/jiffies.h>
-#include <bathos/io.h>
+#include <arch/jiffies.h>
 #include <ppsi/ppsi.h>
+
+#define HZ 1000
 
 static unsigned long long jiffies_base;
 static const int nsec_per_jiffy = 1000 * 1000 * 1000 / HZ;
 
-static int bathos_time_get(struct pp_instance *ppi, TimeInternal *t)
+volatile unsigned long jiffies;
+
+static int chibios_time_get(struct pp_instance *ppi, TimeInternal *t)
 {
 	/* FIXME: horrible time-keeping based on jiffies */
 	unsigned long long j = jiffies_base + jiffies;
@@ -24,7 +26,7 @@ static int bathos_time_get(struct pp_instance *ppi, TimeInternal *t)
 	return 0;
 }
 
-static int bathos_time_set(struct pp_instance *ppi, TimeInternal *t)
+static int chibios_time_set(struct pp_instance *ppi, TimeInternal *t)
 {
 	unsigned long long j = (long long)(t->seconds) * HZ
 		+ (t->nanoseconds + nsec_per_jiffy / 2) / nsec_per_jiffy;
@@ -35,7 +37,7 @@ static int bathos_time_set(struct pp_instance *ppi, TimeInternal *t)
 	return 0;
 }
 
-static int bathos_time_adjust(struct pp_instance *ppi, long offset_ns,
+static int chibios_time_adjust(struct pp_instance *ppi, long offset_ns,
 			    long freq_ppm)
 {
 	/* FIXME: no adj-time is present */
@@ -43,26 +45,26 @@ static int bathos_time_adjust(struct pp_instance *ppi, long offset_ns,
 	return 0;
 }
 
-int bathos_time_adjust_offset(struct pp_instance *ppi, long offset_ns)
+int chibios_time_adjust_offset(struct pp_instance *ppi, long offset_ns)
 {
-	return bathos_time_adjust(ppi, offset_ns, 0);
+	return chibios_time_adjust(ppi, offset_ns, 0);
 }
 
-int bathos_time_adjust_freq(struct pp_instance *ppi, long freq_ppm)
+int chibios_time_adjust_freq(struct pp_instance *ppi, long freq_ppm)
 {
-	return bathos_time_adjust(ppi, 0, freq_ppm);
+	return chibios_time_adjust(ppi, 0, freq_ppm);
 }
 
 /*
  * Unfortuanately (my own bug, it seems), the timeout is not expressed
  * in generic "jiffies", but rather in milliseconds. Currently the fix
- * is setting HZ to 1000 in bathos.
+ * is setting HZ to 1000 in chibios.
  */
 #if HZ != 1000
 #error "HZ must be 1000, until the code is fixed"
 #endif
 
-static unsigned long bathos_calc_timeout(struct pp_instance *ppi, int millisec)
+static unsigned long chibios_calc_timeout(struct pp_instance *ppi, int millisec)
 {
 	/* ms to jiffies... */
 	unsigned long j = millisec * 1000 * 1000 / nsec_per_jiffy;
@@ -70,11 +72,11 @@ static unsigned long bathos_calc_timeout(struct pp_instance *ppi, int millisec)
 }
 
 
-struct pp_time_operations bathos_time_ops = {
-	.get = bathos_time_get,
-	.set = bathos_time_set,
-	.adjust = bathos_time_adjust,
-	.adjust_offset = bathos_time_adjust_offset,
-	.adjust_freq = bathos_time_adjust_freq,
-	.calc_timeout = bathos_calc_timeout,
+struct pp_time_operations chibios_time_ops = {
+	.get = chibios_time_get,
+	.set = chibios_time_set,
+	.adjust = chibios_time_adjust,
+	.adjust_offset = chibios_time_adjust_offset,
+	.adjust_freq = chibios_time_adjust_freq,
+	.calc_timeout = chibios_calc_timeout,
 };

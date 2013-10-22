@@ -5,10 +5,8 @@ CFLAGS += -ffreestanding -Os
 
 # The bathos source tree is expected to be in ../bathos, and default is arm7
 # CROSS_COMPILE is set by the user.
-BATHOS_ROOT ?= ../bathos
-BATHOS_ARCH ?= lpc2104
 
-CFLAGS += -I$(BATHOS_ROOT)/include -I$(BATHOS_ROOT)/arch-$(BATHOS_ARCH) -Itools
+CFLAGS += -I$(CHIBIOS_ROOT)/os/kernel/include -I$(CHIBIOS_ROOT)/os/hal/include -Itools
 
 # Let's use the pp_printf we already have in bathos
 CONFIG_NO_PRINTF = y
@@ -22,14 +20,14 @@ LIBS += -L$A -larch
 
 
 OBJ-libarch := \
-	$A/bathos-task.o \
+	$A/chibios-task.o \
 	$A/memcmp.o \
 	lib/dump-funcs.o \
 	lib/div64.o
 
 # We only support our own time operations
-TIME := bathos
-include time-bathos/Makefile
+TIME := chibios
+include time-chibios/Makefile
 
 $(LIBARCH): $(OBJ-libarch)
 	$(AR) r $@ $^

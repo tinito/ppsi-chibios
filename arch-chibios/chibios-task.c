@@ -1,8 +1,4 @@
-
-#include <bathos/bathos.h>
-#include <bathos/jiffies.h>
-#include <bathos/io.h>
-
+#include <arch/jiffies.h>
 #include <ppsi/ppsi.h>
 
 /* Again, allow env-based setup */
@@ -12,8 +8,6 @@
 
 const int pp_diag_verbosity; /* not really used by now, to be removed */
 
-static struct pp_globals	ppg_static;
-static struct pp_instance	ppi_static;
 
 /* ppi fields */
 static DSDefault		defaultDS;
@@ -25,10 +19,8 @@ static struct pp_servo		servo;
 
 
 /* At boot, initialize the status for this task */
-static int ppsi_init(void *status)
+int ppsi_init(struct pp_instance *ppi, struct pp_globals *ppg)
 {
-	struct pp_instance *ppi = status;
-	struct pp_globals *ppg = &ppg_static;
 
 	printf("%s: verbosity string: \"%s\"\n", __func__,
 	       PP_DIAG_VERBOSITY);
@@ -99,13 +91,3 @@ out_calc:
 	next_to = ppi->t_ops->calc_timeout(ppi, delay_ms);
 	return arg;
 }
-
-static struct bathos_task __task t_pwm = {
-	.name		= "ppsi",
-	.period		= HZ / 10,
-	.init		= ppsi_init,
-	.job		= ppsi_job,
-	.arg		= &ppi_static,
-	.release	= 2 * HZ,
-};
-
